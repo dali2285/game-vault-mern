@@ -13,7 +13,7 @@ import {
   WISHLIST_TOGGLE_SUCCESS,
 } from '../constants';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const register = (name, email, password) => async (dispatch) => {
   dispatch({ type: AUTH_REGISTER_REQUEST });

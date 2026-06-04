@@ -8,7 +8,7 @@ import {
   ORDER_LIST_FAIL,
 } from '../constants';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const authHeader = (getState) => {
   const { auth } = getState();
@@ -21,7 +21,9 @@ export const createOrder = (orderData) => async (dispatch, getState) => {
     const { data } = await axios.post(`${API}/orders`, orderData, authHeader(getState));
     dispatch({ type: ORDER_CREATE_SUCCESS, payload: data });
   } catch (err) {
-    dispatch({ type: ORDER_CREATE_FAIL, payload: err.response?.data?.message || err.message });
+    const message = err.response?.data?.message || err.message;
+    dispatch({ type: ORDER_CREATE_FAIL, payload: message });
+    throw new Error(message);
   }
 };
 

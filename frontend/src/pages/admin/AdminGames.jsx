@@ -1,23 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { listGames, deleteGame } from '../../../redux/actions/gameActions';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
+import ConfirmModal from '../../components/ConfirmModal';
+import { useToast } from '../../components/Toast';
 
 function AdminGames() {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { games, loading, error } = useSelector((state) => state.gamesList);
   const { success: deleteSuccess } = useSelector((state) => state.gameDelete);
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, title: '' });
 
   useEffect(() => {
     dispatch(listGames('', 'All', '', 1));
   }, [dispatch, deleteSuccess]);
 
-  const handleDelete = (id, title) => {
-    if (window.confirm(`Delete "${title}"? This cannot be undone.`)) {
-      dispatch(deleteGame(id));
+  useEffect(() => {
+    if (deleteSuccess) {
+      showToast('Game deleted successfully', 'success');
     }
+  }, [deleteSuccess, showToast]);
+
+  const handleDelete = (id, title) => {
+    setConfirmDelete({ isOpen: true, id, title });
+  };
+
+  const closeDeleteModal = () => {
+    setConfirmDelete({ isOpen: false, id: null, title: '' });
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(deleteGame(confirmDelete.id));
+    closeDeleteModal();
   };
 
   return (
@@ -29,6 +46,16 @@ function AdminGames() {
           <Link to="/admin/games/new" className="btn-primary">+ Add Game</Link>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title={`Delete "${confirmDelete.title}"?`}
+        message="This action cannot be undone."
+        confirmText="Delete"
+        destructive
+        onConfirm={handleConfirmDelete}
+        onClose={closeDeleteModal}
+      />
 
       {loading ? (
         <Loader />

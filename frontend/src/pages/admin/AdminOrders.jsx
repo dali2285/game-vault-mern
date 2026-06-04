@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const STATUS_OPTIONS = ['pending', 'processing', 'completed', 'cancelled'];
 
 function AdminOrders() {
@@ -15,7 +17,7 @@ function AdminOrders() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/orders/admin', {
+      const res = await fetch(`${API}/orders/admin`, {
         headers: { Authorization: `Bearer ${userInfo.token}` },
       });
       const data = await res.json();
@@ -33,7 +35,7 @@ function AdminOrders() {
 
   const handleStatusChange = async (orderId, status) => {
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      await fetch(`${API}/orders/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

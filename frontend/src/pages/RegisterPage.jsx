@@ -5,10 +5,12 @@ import { register } from '../../redux/actions/authActions';
 import { getProfile } from '../../redux/actions/authActions';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import { useToast } from '../components/Toast';
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { userInfo, loading, error } = useSelector((state) => state.auth);
 
   const [name, setName] = useState('');
@@ -19,10 +21,11 @@ function RegisterPage() {
 
   useEffect(() => {
     if (userInfo) {
+      showToast('Registration successful', 'success');
       dispatch(getProfile());
       navigate('/');
     }
-  }, [userInfo, navigate, dispatch]);
+  }, [userInfo, navigate, dispatch, showToast]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

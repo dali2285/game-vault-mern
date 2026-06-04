@@ -88,10 +88,12 @@ function OrdersTab() {
   const { userInfo } = useSelector((state) => state.auth);
   const axios = window._axios;
 
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/orders/user', {
+        const res = await fetch(`${API}/orders/user`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
         const data = await res.json();

@@ -17,7 +17,7 @@ import {
   GAME_DELETE_FAIL,
 } from '../constants';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const listGames = (search = '', category = 'All', sort = '', page = 1) => async (dispatch) => {
   dispatch({ type: GAMES_LIST_REQUEST });

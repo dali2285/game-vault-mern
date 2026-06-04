@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createGame, updateGame, getGameDetails } from '../../../redux/actions/gameActions';
+import { GAME_CREATE_RESET, GAME_UPDATE_RESET } from '../../../redux/constants';
 import Message from '../../components/Message';
 import Loader from '../../components/Loader';
+import { useToast } from '../../components/Toast';
 
 const CATEGORIES = ['Action', 'RPG', 'Sports', 'Shooter', 'Open World', 'Sandbox', 'Battle Royale', 'Adventure', 'Simulation'];
 
@@ -16,7 +18,9 @@ function GameFormPage() {
   const { game, loading: detailLoading } = useSelector((state) => state.gameDetail);
   const { loading: createLoading, success: createSuccess, error: createError } = useSelector((state) => state.gameCreate);
   const { loading: updateLoading, success: updateSuccess, error: updateError } = useSelector((state) => state.gameUpdate);
+  const { showToast } = useToast();
 
+  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -24,6 +28,11 @@ function GameFormPage() {
     category: 'Action',
     images: '',
   });
+
+  useEffect(() => {
+    dispatch({ type: GAME_CREATE_RESET });
+    dispatch({ type: GAME_UPDATE_RESET });
+  }, [dispatch]);
 
   useEffect(() => {
     if (isEdit) {
@@ -44,10 +53,16 @@ function GameFormPage() {
   }, [game, isEdit, id]);
 
   useEffect(() => {
-    if (createSuccess || updateSuccess) {
+    if (!submitted) return;
+
+    if (createSuccess) {
+      showToast('Game created successfully', 'success');
+      navigate('/admin/games');
+    } else if (updateSuccess) {
+      showToast('Game updated successfully', 'success');
       navigate('/admin/games');
     }
-  }, [createSuccess, updateSuccess, navigate]);
+  }, [createSuccess, updateSuccess, navigate, submitted, showToast]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -63,6 +78,7 @@ function GameFormPage() {
         .map((s) => s.trim())
         .filter(Boolean),
     };
+    setSubmitted(true);
     if (isEdit) {
       dispatch(updateGame(id, gameData));
     } else {

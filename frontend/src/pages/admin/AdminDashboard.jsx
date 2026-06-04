@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Loader from '../../components/Loader';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 function AdminDashboard() {
   const { userInfo } = useSelector((state) => state.auth);
   const [stats, setStats] = useState(null);
@@ -11,7 +13,7 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/users/stats', {
+        const res = await fetch(`${API}/users/stats`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
         const data = await res.json();

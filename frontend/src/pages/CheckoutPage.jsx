@@ -4,13 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../../redux/actions/orderActions';
 import { CART_CLEAR } from '../../redux/constants';
 import Message from '../components/Message';
+import ConfirmModal from '../components/ConfirmModal';
 
 function CheckoutPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cartItems } = useSelector((state) => state.cart);
-  const { loading: orderLoading, error: orderError } = useSelector((state) => state.auth);
-
   const [form, setForm] = useState({
     cardName: '',
     cardNumber: '',
@@ -18,6 +17,9 @@ function CheckoutPage() {
     cvv: '',
   });
   const [success, setSuccess] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const total = cartItems.reduce((sum, item) => sum + item.game.price * item.quantity, 0);
 
@@ -25,8 +27,16 @@ function CheckoutPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setShowConfirm(true);
+  };
+
+  const handleConfirmOrder = async () => {
+    setShowConfirm(false);
+    setOrderError('');
+    setIsSubmitting(true);
+
     const games = cartItems.map((item) => ({
       game: item.game._id,
       title: item.game.title,
@@ -35,10 +45,16 @@ function CheckoutPage() {
       image: item.game.images?.[0] || '',
     }));
 
-    await dispatch(createOrder({ games, totalPrice: total, paymentMethod: 'card' }));
-    dispatch({ type: CART_CLEAR });
-    setSuccess(true);
-    setTimeout(() => navigate('/profile'), 2500);
+    try {
+      await dispatch(createOrder({ games, totalPrice: total, paymentMethod: 'card' }));
+      dispatch({ type: CART_CLEAR });
+      setSuccess(true);
+      setTimeout(() => navigate('/profile'), 2500);
+    } catch (err) {
+      setOrderError(err.message || 'Unable to complete your order.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (success) {
@@ -58,6 +74,16 @@ function CheckoutPage() {
       <h1 className="page-title">Checkout</h1>
 
       {orderError && <Message type="error">{orderError}</Message>}
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Confirm Order"
+        message={`Pay $${total.toFixed(2)} and place your order now?`}
+        confirmText={`Pay $${total.toFixed(2)}`}
+        cancelText="Review"
+        onConfirm={handleConfirmOrder}
+        onClose={() => setShowConfirm(false)}
+      />
 
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={handleSubmit}>
@@ -119,8 +145,8 @@ function CheckoutPage() {
               />
             </div>
           </div>
-          <button type="submit" className="btn-primary btn-full" disabled={orderLoading}>
-            {orderLoading ? 'Processing...' : `Pay $${total.toFixed(2)}`}
+          <button type="submit" className="btn-primary btn-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Processing...' : `Pay $${total.toFixed(2)}`}
           </button>
         </form>
 

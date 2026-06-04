@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/authActions';
+import { useToast } from './Toast';
 
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { userInfo } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,6 +18,7 @@ function Navbar() {
   const handleLogout = () => {
     dispatch(logout());
     setDropdownOpen(false);
+    showToast('Logout successful', 'success');
     navigate('/');
   };
 

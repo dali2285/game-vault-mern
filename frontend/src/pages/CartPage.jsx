@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadCart, removeFromCart, updateCartItem } from '../../redux/actions/cartActions';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import ConfirmModal from '../components/ConfirmModal';
 
 function CartPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cartItems, loading, error } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
+  const [confirmRemove, setConfirmRemove] = useState({ isOpen: false, gameId: null, title: '' });
 
   useEffect(() => {
     if (userInfo) dispatch(loadCart());
@@ -17,8 +19,17 @@ function CartPage() {
 
   const total = cartItems.reduce((sum, item) => sum + item.game.price * item.quantity, 0);
 
-  const handleRemove = (gameId) => {
-    dispatch(removeFromCart(gameId));
+  const handleRemove = (gameId, title) => {
+    setConfirmRemove({ isOpen: true, gameId, title });
+  };
+
+  const closeRemoveModal = () => {
+    setConfirmRemove({ isOpen: false, gameId: null, title: '' });
+  };
+
+  const handleConfirmRemove = () => {
+    dispatch(removeFromCart(confirmRemove.gameId));
+    closeRemoveModal();
   };
 
   const handleQty = (gameId, qty) => {
@@ -32,6 +43,16 @@ function CartPage() {
       <h1 className="page-title">Shopping <span className="accent">Cart</span></h1>
 
       {error && <Message type="error">{error}</Message>}
+
+      <ConfirmModal
+        isOpen={confirmRemove.isOpen}
+        title={`Remove "${confirmRemove.title}" from cart?`}
+        message="This item will be removed from your shopping cart."
+        confirmText="Remove"
+        destructive
+        onConfirm={handleConfirmRemove}
+        onClose={closeRemoveModal}
+      />
 
       {cartItems.length === 0 ? (
         <div className="empty-cart">
@@ -78,7 +99,7 @@ function CartPage() {
                 </span>
                 <button
                   className="cart-remove-btn"
-                  onClick={() => handleRemove(item.game._id)}
+                  onClick={() => handleRemove(item.game._id, item.game.title)}
                   aria-label="Remove item"
                 >
                   &#10005;

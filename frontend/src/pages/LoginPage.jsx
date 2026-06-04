@@ -6,10 +6,12 @@ import { loadCart } from '../../redux/actions/cartActions';
 import { getProfile } from '../../redux/actions/authActions';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import { useToast } from '../components/Toast';
 
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { userInfo, loading, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
@@ -17,11 +19,12 @@ function LoginPage() {
 
   useEffect(() => {
     if (userInfo) {
+      showToast('Login successful', 'success');
       dispatch(loadCart());
       dispatch(getProfile());
       navigate(userInfo.role === 'admin' ? '/admin' : '/');
     }
-  }, [userInfo, navigate, dispatch]);
+  }, [userInfo, navigate, dispatch, showToast]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

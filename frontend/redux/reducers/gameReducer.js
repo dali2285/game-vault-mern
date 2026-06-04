@@ -14,6 +14,8 @@ import {
   GAME_DELETE_REQUEST,
   GAME_DELETE_SUCCESS,
   GAME_DELETE_FAIL,
+  GAME_CREATE_RESET,
+  GAME_UPDATE_RESET,
 } from '../constants';
 
 const gamesListInitial = { loading: false, games: [], total: 0, page: 1, pages: 1, error: null };
@@ -62,6 +64,8 @@ export const gameCreateReducer = (state = { loading: false, game: null, error: n
       return { loading: false, game: action.payload, error: null, success: true };
     case GAME_CREATE_FAIL:
       return { loading: false, game: null, error: action.payload, success: false };
+    case GAME_CREATE_RESET:
+      return { loading: false, game: null, error: null, success: false };
     default:
       return state;
   }
@@ -75,6 +79,8 @@ export const gameUpdateReducer = (state = { loading: false, game: null, error: n
       return { loading: false, game: action.payload, error: null, success: true };
     case GAME_UPDATE_FAIL:
       return { loading: false, game: null, error: action.payload, success: false };
+    case GAME_UPDATE_RESET:
+      return { loading: false, game: null, error: null, success: false };
     default:
       return state;
   }

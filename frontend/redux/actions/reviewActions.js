@@ -6,7 +6,7 @@ import {
 } from '../constants';
 import { getGameDetails } from './gameActions';
 
-const API = 'http://localhost:5000/api';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const createReview = (gameId, rating, comment) => async (dispatch, getState) => {
   dispatch({ type: REVIEW_CREATE_REQUEST });
