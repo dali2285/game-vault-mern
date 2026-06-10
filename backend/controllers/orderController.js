@@ -70,4 +70,38 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, getUserOrders, getAllOrders, updateOrderStatus };
+// @desc    Get purchased games from completed orders
+// @route   GET /api/orders/user/library
+const getPurchasedGames = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id, status: 'completed' }).populate('games.game', 'title images price');
+
+    const purchasedGamesMap = new Map();
+
+    orders.forEach((order) => {
+      order.games.forEach((item) => {
+        const gameId = item.game?._id?.toString() || item._id?.toString();
+        if (!gameId) return;
+
+        if (!purchasedGamesMap.has(gameId)) {
+          purchasedGamesMap.set(gameId, {
+            gameId,
+            title: item.game?.title || item.title,
+            image: item.game?.images?.[0] || item.image || null,
+            price: item.game?.price || item.price,
+            quantity: item.quantity,
+            purchasedAt: order.createdAt,
+            orderId: order._id,
+          });
+        }
+      });
+    });
+
+    res.json(Array.from(purchasedGamesMap.values()));
+  } catch (err) {
+    console.error('[v0] getPurchasedGames error:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { createOrder, getUserOrders, getAllOrders, updateOrderStatus, getPurchasedGames };

@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 
 const generateToken = (id) => {
@@ -29,6 +31,7 @@ const register = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatarUrl: user.avatarUrl || null,
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -62,6 +65,7 @@ const login = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatarUrl: user.avatarUrl || null,
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -87,4 +91,54 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile };
+// @desc    Update user profile avatar
+// @route   PUT /api/auth/profile
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const shouldRemoveAvatar = req.body.removeAvatar === 'true' || req.body.removeAvatar === true;
+
+    if (shouldRemoveAvatar && user.avatarUrl) {
+      const existingMatch = user.avatarUrl.match(/\/uploads\/(.+)$/);
+      if (existingMatch) {
+        const existingPath = path.join(__dirname, '..', 'uploads', existingMatch[1]);
+        if (fs.existsSync(existingPath)) {
+          fs.unlinkSync(existingPath);
+        }
+      }
+      user.avatarUrl = undefined;
+    }
+
+    if (req.file) {
+      if (user.avatarUrl) {
+        const existingMatch = user.avatarUrl.match(/\/uploads\/(.+)$/);
+        if (existingMatch) {
+          const existingPath = path.join(__dirname, '..', 'uploads', existingMatch[1]);
+          if (fs.existsSync(existingPath)) {
+            fs.unlinkSync(existingPath);
+          }
+        }
+      }
+      const avatarPath = `/uploads/${req.file.filename}`;
+      user.avatarUrl = `${req.protocol}://${req.get('host')}${avatarPath}`;
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(user._id)
+      .select('-password')
+      .populate('cart.game', 'title price images')
+      .populate('wishlist', 'title price images rating')
+      .populate('ratings.gameId', 'title _id')
+      .populate('comments.gameId', 'title');
+
+    res.json(updatedUser);
+  } catch (err) {
+    console.error('[v0] updateProfile error:', err.message);
+    res.status(500).json({ message: 'Server error while updating profile' });
+  }
+};
+
+module.exports = { register, login, getProfile, updateProfile };

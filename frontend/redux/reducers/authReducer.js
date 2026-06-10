@@ -35,7 +35,19 @@ const authReducer = (state = initialState, action) => {
       return { ...state, loading: false, userInfo: action.payload, error: null };
 
     case AUTH_PROFILE_SUCCESS:
-      return { ...state, loading: false, profile: action.payload };
+      return {
+        ...state,
+        loading: false,
+        profile: action.payload,
+        userInfo: state.userInfo
+          ? {
+              ...state.userInfo,
+              avatarUrl: action.payload.avatarUrl,
+              name: action.payload.name || state.userInfo.name,
+              email: action.payload.email || state.userInfo.email,
+            }
+          : state.userInfo,
+      };
 
     case AUTH_REGISTER_FAIL:
     case AUTH_LOGIN_FAIL:

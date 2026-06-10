@@ -63,6 +63,32 @@ export const getProfile = () => async (dispatch, getState) => {
   }
 };
 
+export const uploadAvatar = (avatarFile, removeAvatar = false) => async (dispatch, getState) => {
+  dispatch({ type: AUTH_PROFILE_REQUEST });
+  try {
+    const { auth } = getState();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${auth.userInfo.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    const formData = new FormData();
+    if (avatarFile) formData.append('avatar', avatarFile);
+    if (removeAvatar) formData.append('removeAvatar', 'true');
+
+    const { data } = await axios.put(`${API}/auth/profile`, formData, config);
+    dispatch({ type: AUTH_PROFILE_SUCCESS, payload: data });
+  } catch (err) {
+    dispatch({
+      type: AUTH_PROFILE_FAIL,
+      payload: err.response?.data?.message || err.message,
+    });
+    throw err;
+  }
+};
+
 export const toggleWishlist = (gameId) => async (dispatch, getState) => {
   try {
     const { auth } = getState();

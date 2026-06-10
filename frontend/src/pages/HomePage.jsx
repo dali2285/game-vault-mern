@@ -11,6 +11,7 @@ const CATEGORIES = ['Action', 'RPG', 'Sports', 'Shooter', 'Open World', 'Sandbox
 function HomePage() {
   const dispatch = useDispatch();
   const { games, loading, error } = useSelector((state) => state.gamesList);
+  const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(listGames());
@@ -34,7 +35,15 @@ function HomePage() {
           </p>
           <div className="hero-actions">
             <Link to="/games" className="btn-primary">Browse Games</Link>
-            <Link to="/register" className="btn-outline">Join Now</Link>
+            {userInfo ? (
+              <Link to="/profile" className="btn-outline">
+                My Profile
+              </Link>
+            ) : (
+              <Link to="/register" className="btn-outline">
+                Join Now
+              </Link>
+            )}
           </div>
         </div>
         <div className="hero-visual">

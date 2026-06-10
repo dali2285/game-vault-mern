@@ -1,7 +1,29 @@
-/* GameVault - Dark Gaming Theme */
+/* GameVault - Themeable Gaming Store */
 
 /* ==================== VARIABLES ==================== */
 :root {
+  /* Light Mode Colors */
+  --primary: #0066ff;
+  --primary-dark: #0052cc;
+  --secondary: #ff1493;
+  --accent: #7c3aed;
+  --bg-dark: #ffffff;
+  --bg-card: #f5f5f7;
+  --bg-card-hover: #efefef;
+  --border: #e0e0e0;
+  --border-light: #d0d0d0;
+  --text: #1a1a1a;
+  --text-muted: #666666;
+  --success: #00b848;
+  --warning: #ff9500;
+  --error: #ff3b30;
+  --radius: 8px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --glow: 0 0 20px rgba(0, 102, 255, 0.2);
+}
+
+html.dark {
+  /* Dark Mode Colors */
   --primary: #00d4ff;
   --primary-dark: #00a8cc;
   --secondary: #ff006e;
@@ -16,12 +38,17 @@
   --success: #00ff88;
   --warning: #ffb000;
   --error: #ff4466;
-  --radius: 8px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --glow: 0 0 20px rgba(0, 212, 255, 0.3);
 }
 
 /* ==================== RESET ==================== */
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
 *,
 *::before,
 *::after {
@@ -361,6 +388,52 @@ h4 {
   transform: translateY(-1px);
 }
 
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.nav-avatar,
+.nav-avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.nav-avatar {
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-avatar-placeholder {
+  background: var(--primary);
+  color: var(--bg-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .cart-link {
   position: relative;
 }
@@ -562,6 +635,74 @@ h4 {
   .footer-brand {
     align-items: center;
   }
+}
+
+/* ==================== LIBRARY TAB ==================== */
+.library-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.library-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 360px;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: var(--shadow);
+}
+
+.library-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+}
+
+.library-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: linear-gradient(180deg, rgba(10, 10, 26, 0.9), transparent);
+}
+
+.library-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  padding: 1.25rem;
+  gap: 1rem;
+}
+
+.library-card-title {
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0;
+  min-height: 3rem;
+}
+
+.btn-install {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.install-modal {
+  max-width: 420px;
+  width: min(100%, 420px);
+}
+
+.install-modal .confirm-modal-body {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.install-modal .confirm-modal-actions {
+  justify-content: flex-end;
 }
 
 /* ==================== HERO ==================== */
@@ -2906,19 +3047,25 @@ h4 {
 }
 
 .toast-success {
-  border-color: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.25);
+  background: rgba(0, 75, 35, 0.94);
+  color: #e6ffef;
 }
 
 .toast-error {
-  border-color: rgba(255, 68, 102, 0.25);
+  border-color: rgba(255, 68, 102, 0.45);
+  background: rgba(109, 15, 20, 0.95);
+  color: #ffe7ec;
 }
 
 .toast-info {
   border-color: rgba(0, 212, 255, 0.25);
+  background: rgba(6, 81, 109, 0.95);
 }
 
 .toast-warning {
-  border-color: rgba(255, 176, 0, 0.25);
+  border-color: rgba(255, 176, 0, 0.35);
+  background: rgba(115, 69, 0, 0.95);
 }
 
 .toast-close {
@@ -3025,4 +3172,104 @@ h4 {
 
 .hidden {
   display: none;
+}.profile-avatar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.25);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.avatar-frame {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: visible;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.14), rgba(139, 92, 246, 0.14));
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  margin: 0 auto;
+}
+
+.avatar-mask {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.profile-avatar-img,
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--bg-dark);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-upload-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 212, 255, 0.2);
+}
+
+.profile-avatar-meta {
+  text-align: center;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.avatar-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.spinner-inline {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.profile-sidebar {
+  display: grid;
+  gap: 1.5rem;
 }

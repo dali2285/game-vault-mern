@@ -3,6 +3,7 @@ import { thunk } from 'redux-thunk';
 import authReducer from './reducers/authReducer';
 import cartReducer from './reducers/cartReducer';
 import reviewReducer from './reducers/reviewReducer';
+import orderLibraryReducer from './reducers/orderReducer';
 import {
   gamesListReducer,
   gameDetailReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   cart: cartReducer,
   review: reviewReducer,
+  orderLibrary: orderLibraryReducer,
   gamesList: gamesListReducer,
   gameDetail: gameDetailReducer,
   gameCreate: gameCreateReducer,

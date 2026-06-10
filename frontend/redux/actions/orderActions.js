@@ -6,6 +6,9 @@ import {
   ORDER_LIST_REQUEST,
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,
+  ORDER_LIBRARY_REQUEST,
+  ORDER_LIBRARY_SUCCESS,
+  ORDER_LIBRARY_FAIL,
 } from '../constants';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -45,5 +48,15 @@ export const listAllOrders = () => async (dispatch, getState) => {
     dispatch({ type: ORDER_LIST_SUCCESS, payload: data });
   } catch (err) {
     dispatch({ type: ORDER_LIST_FAIL, payload: err.response?.data?.message || err.message });
+  }
+};
+
+export const listPurchasedGames = () => async (dispatch, getState) => {
+  dispatch({ type: ORDER_LIBRARY_REQUEST });
+  try {
+    const { data } = await axios.get(`${API}/orders/user/library`, authHeader(getState));
+    dispatch({ type: ORDER_LIBRARY_SUCCESS, payload: data });
+  } catch (err) {
+    dispatch({ type: ORDER_LIBRARY_FAIL, payload: err.response?.data?.message || err.message });
   }
 };
