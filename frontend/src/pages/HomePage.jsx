@@ -5,6 +5,7 @@ import { listGames } from '../../redux/actions/gameActions';
 import GameCard from '../components/GameCard';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import { getImageSrc } from '../utils/imageUtils';
 
 const CATEGORIES = ['Action', 'RPG', 'Sports', 'Shooter', 'Open World', 'Sandbox', 'Battle Royale'];
 
@@ -52,7 +53,7 @@ function HomePage() {
             {games.slice(0, 3).map((game, i) => (
               <div key={game._id} className={`hero-stack-card hero-stack-${i}`}>
                 <img
-                  src={game.images?.[0] || 'https://placehold.co/200x260/0a0a1a/00d4ff?text=Game'}
+                  src={getImageSrc(game.images?.[0]) || 'https://placehold.co/200x260/0a0a1a/00d4ff?text=Game'}
                   alt={game.title}
                   onError={(e) => { e.target.src = 'https://placehold.co/200x260/0a0a1a/00d4ff?text=Game'; }}
                 />

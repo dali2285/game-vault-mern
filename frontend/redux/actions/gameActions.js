@@ -56,7 +56,18 @@ export const createGame = (gameData) => async (dispatch, getState) => {
   dispatch({ type: GAME_CREATE_REQUEST });
   try {
     const { auth } = getState();
-    const config = { headers: { Authorization: `Bearer ${auth.userInfo.token}` } };
+    
+    // Check if gameData is FormData (contains files)
+    const isFormData = gameData instanceof FormData;
+    const config = { 
+      headers: { Authorization: `Bearer ${auth.userInfo.token}` }
+    };
+    
+    // Only set content-type for JSON, FormData will set it automatically
+    if (!isFormData) {
+      config.headers['Content-Type'] = 'application/json';
+    }
+    
     const { data } = await axios.post(`${API}/games`, gameData, config);
     dispatch({ type: GAME_CREATE_SUCCESS, payload: data });
   } catch (err) {
@@ -71,7 +82,18 @@ export const updateGame = (id, gameData) => async (dispatch, getState) => {
   dispatch({ type: GAME_UPDATE_REQUEST });
   try {
     const { auth } = getState();
-    const config = { headers: { Authorization: `Bearer ${auth.userInfo.token}` } };
+    
+    // Check if gameData is FormData (contains files)
+    const isFormData = gameData instanceof FormData;
+    const config = { 
+      headers: { Authorization: `Bearer ${auth.userInfo.token}` }
+    };
+    
+    // Only set content-type for JSON, FormData will set it automatically
+    if (!isFormData) {
+      config.headers['Content-Type'] = 'application/json';
+    }
+    
     const { data } = await axios.put(`${API}/games/${id}`, gameData, config);
     dispatch({ type: GAME_UPDATE_SUCCESS, payload: data });
   } catch (err) {

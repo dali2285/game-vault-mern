@@ -49,8 +49,31 @@ const getGameById = async (req, res) => {
 // @route   POST /api/games
 const createGame = async (req, res) => {
   try {
-    const { title, description, price, category, images } = req.body;
-    const game = await Game.create({ title, description, price, category, images: images || [] });
+    const { title, description, price, category, imageUrls } = req.body;
+    
+    // Combine uploaded files and image URLs
+    let images = [];
+    
+    // Add uploaded file paths
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(file => `/uploads/${file.filename}`);
+    }
+    
+    // Add provided URLs
+    if (imageUrls) {
+      const urlArray = typeof imageUrls === 'string' 
+        ? imageUrls.split(',').map(url => url.trim()).filter(Boolean)
+        : Array.isArray(imageUrls) ? imageUrls : [];
+      images = [...images, ...urlArray];
+    }
+    
+    const game = await Game.create({ 
+      title, 
+      description, 
+      price, 
+      category, 
+      images: images.length > 0 ? images : [] 
+    });
     res.status(201).json(game);
   } catch (err) {
     console.error('[v0] createGame error:', err.message);
@@ -62,9 +85,40 @@ const createGame = async (req, res) => {
 // @route   PUT /api/games/:id
 const updateGame = async (req, res) => {
   try {
-    const game = await Game.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const { imageUrls } = req.body;
+    let updateData = { ...req.body };
+    delete updateData.imageUrls;
+    
+    // Get existing game to preserve images if needed
+    const game = await Game.findById(req.params.id);
     if (!game) return res.status(404).json({ message: 'Game not found' });
-    res.json(game);
+    
+    // Handle images
+    let images = game.images || [];
+    
+    // If new files uploaded, replace/add to images
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(file => `/uploads/${file.filename}`);
+      // Replace existing images or add new ones
+      images = newImages.length > 0 ? newImages : images;
+    }
+    
+    // Add image URLs if provided
+    if (imageUrls) {
+      const urlArray = typeof imageUrls === 'string' 
+        ? imageUrls.split(',').map(url => url.trim()).filter(Boolean)
+        : Array.isArray(imageUrls) ? imageUrls : [];
+      if (urlArray.length > 0) {
+        images = req.files && req.files.length > 0 
+          ? [...images, ...urlArray] 
+          : urlArray;
+      }
+    }
+    
+    updateData.images = images;
+    
+    const updatedGame = await Game.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
+    res.json(updatedGame);
   } catch (err) {
     console.error('[v0] updateGame error:', err.message);
     res.status(500).json({ message: 'Server error' });

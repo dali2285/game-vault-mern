@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/actions/cartActions';
 import { toggleWishlist } from '../../redux/actions/authActions';
 import StarRating from './StarRating';
+import { getImageSrc } from '../utils/imageUtils';
 
 function GameCard({ game }) {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ function GameCard({ game }) {
     dispatch(toggleWishlist(game._id));
   };
 
-  const imageUrl = game.images?.[0] || 'https://placehold.co/300x200/0a0a1a/00d4ff?text=No+Image';
+  const imageUrl = getImageSrc(game.images?.[0]) || 'https://placehold.co/300x200/0a0a1a/00d4ff?text=No+Image';
 
   return (
     <div className="game-card">

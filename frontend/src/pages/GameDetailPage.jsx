@@ -8,6 +8,7 @@ import { toggleWishlist } from '../../redux/actions/authActions';
 import StarRating from '../components/StarRating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import { normalizeImages } from '../utils/imageUtils';
 
 function GameDetailPage() {
   const { id } = useParams();
@@ -60,7 +61,8 @@ function GameDetailPage() {
   if (error) return <div className="page"><Message type="error">{error}</Message></div>;
   if (!game) return null;
 
-  const images = game.images?.length > 0 ? game.images : ['https://placehold.co/600x400/0a0a1a/00d4ff?text=No+Image'];
+  const images = normalizeImages(game.images);
+  const safeImages = images.length > 0 ? images : ['https://placehold.co/600x400/0a0a1a/00d4ff?text=No+Image'];
 
   return (
     <div className="page game-detail-page">
@@ -72,14 +74,14 @@ function GameDetailPage() {
         <div className="game-images">
           <div className="game-main-image">
             <img
-              src={images[activeImage]}
+              src={safeImages[activeImage]}
               alt={game.title}
               onError={(e) => { e.target.src = 'https://placehold.co/600x400/0a0a1a/00d4ff?text=No+Image'; }}
             />
           </div>
-          {images.length > 1 && (
+          {safeImages.length > 1 && (
             <div className="game-thumbnails">
-              {images.map((img, i) => (
+              {safeImages.map((img, i) => (
                 <img
                   key={i}
                   src={img}

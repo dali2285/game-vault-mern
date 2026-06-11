@@ -5,6 +5,7 @@ import { loadCart, removeFromCart, updateCartItem } from '../../redux/actions/ca
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import ConfirmModal from '../components/ConfirmModal';
+import { getImageSrc } from '../utils/imageUtils';
 
 function CartPage() {
   const dispatch = useDispatch();
@@ -67,7 +68,7 @@ function CartPage() {
             {cartItems.map((item) => (
               <div key={item._id} className="cart-item">
                 <img
-                  src={item.game.images?.[0] || 'https://placehold.co/80x80/0a0a1a/00d4ff?text=Game'}
+                  src={getImageSrc(item.game.images?.[0]) || 'https://placehold.co/80x80/0a0a1a/00d4ff?text=Game'}
                   alt={item.game.title}
                   className="cart-item-image"
                   onError={(e) => { e.target.src = 'https://placehold.co/80x80/0a0a1a/00d4ff?text=Game'; }}

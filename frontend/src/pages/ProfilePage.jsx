@@ -6,6 +6,7 @@ import { listMyOrders, listPurchasedGames } from '../../redux/actions/orderActio
 import { useToast } from '../components/Toast';
 import Loader from '../components/Loader';
 import StarRating from '../components/StarRating';
+import { getImageSrc } from '../utils/imageUtils';
 
 function ProfilePage() {
   const dispatch = useDispatch();
@@ -406,7 +407,7 @@ function WishlistTab({ profile }) {
           {profile.wishlist.map((game) => (
             <Link key={game._id || game} to={`/games/${game._id || game}`} className="wishlist-game-card">
               <img
-                src={game.images?.[0] || 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'}
+                src={getImageSrc(game.images?.[0]) || 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'}
                 alt={game.title || 'Game'}
                 onError={(e) => { e.target.src = 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'; }}
               />

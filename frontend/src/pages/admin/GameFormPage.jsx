@@ -26,8 +26,10 @@ function GameFormPage() {
     description: '',
     price: '',
     category: 'Action',
-    images: '',
+    imageUrls: '',
   });
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filePreviews, setFilePreviews] = useState([]);
 
   useEffect(() => {
     dispatch({ type: GAME_CREATE_RESET });
@@ -47,7 +49,7 @@ function GameFormPage() {
         description: game.description,
         price: game.price,
         category: game.category,
-        images: game.images?.join(', ') || '',
+        imageUrls: game.images?.join(', ') || '',
       });
     }
   }, [game, isEdit, id]);
@@ -68,21 +70,84 @@ function GameFormPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Validate file types
+    const validFiles = files.filter(file => {
+      if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+        showToast(`${file.name} is not a valid image format`, 'error');
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        showToast(`${file.name} is larger than 5MB`, 'error');
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedFiles(validFiles);
+
+    // Create previews
+    const previews = validFiles.map(file => URL.createObjectURL(file));
+    setFilePreviews(previews);
+  };
+
+  const removeFile = (index) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newPreviews = filePreviews.filter((_, i) => i !== index);
+    setSelectedFiles(newFiles);
+    setFilePreviews(newPreviews);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const gameData = {
-      ...form,
-      price: Number(form.price),
-      images: form.images
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-    };
-    setSubmitted(true);
-    if (isEdit) {
-      dispatch(updateGame(id, gameData));
+    
+    // Parse image URLs
+    const imageUrls = form.imageUrls
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    // Create FormData if there are files
+    if (selectedFiles.length > 0) {
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('price', Number(form.price));
+      formData.append('category', form.category);
+      
+      // Add image URLs to FormData
+      if (imageUrls.length > 0) {
+        formData.append('imageUrls', imageUrls.join(','));
+      }
+      
+      // Add files
+      selectedFiles.forEach((file) => {
+        formData.append('images', file);
+      });
+
+      setSubmitted(true);
+      if (isEdit) {
+        dispatch(updateGame(id, formData));
+      } else {
+        dispatch(createGame(formData));
+      }
     } else {
-      dispatch(createGame(gameData));
+      // No files, send regular JSON
+      const gameData = {
+        title: form.title,
+        description: form.description,
+        price: Number(form.price),
+        category: form.category,
+        imageUrls: imageUrls,
+      };
+      setSubmitted(true);
+      if (isEdit) {
+        dispatch(updateGame(id, gameData));
+      } else {
+        dispatch(createGame(gameData));
+      }
     }
   };
 
@@ -164,17 +229,76 @@ function GameFormPage() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="images">Image URLs (comma separated)</label>
+          <label htmlFor="imageUrls">Image URLs (comma separated)</label>
           <input
-            id="images"
-            name="images"
+            id="imageUrls"
+            name="imageUrls"
             type="text"
             className="form-input"
-            value={form.images}
+            value={form.imageUrls}
             onChange={handleChange}
             placeholder="https://example.com/image.jpg"
           />
+          <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+            You can add both URLs and upload files below
+          </small>
         </div>
+
+        <div className="form-group">
+          <label htmlFor="imageFiles">Upload Images from PC (max 5 files, 5MB each)</label>
+          <input
+            id="imageFiles"
+            name="imageFiles"
+            type="file"
+            className="form-input"
+            onChange={handleFileChange}
+            accept="image/*"
+            multiple
+            style={{ padding: '10px', cursor: 'pointer' }}
+          />
+          <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+            Supported formats: JPG, PNG, GIF, WebP
+          </small>
+        </div>
+
+        {selectedFiles.length > 0 && (
+          <div className="form-group">
+            <label>Selected Images ({selectedFiles.length})</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginTop: '10px' }}>
+              {filePreviews.map((preview, index) => (
+                <div key={index} style={{ position: 'relative' }}>
+                  <img
+                    src={preview}
+                    alt={`Preview ${index}`}
+                    style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    style={{
+                      position: 'absolute',
+                      top: '5px',
+                      right: '5px',
+                      background: 'rgba(255, 0, 0, 0.8)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="form-actions">
           <button

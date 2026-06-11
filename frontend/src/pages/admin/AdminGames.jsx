@@ -6,6 +6,7 @@ import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useToast } from '../../components/Toast';
+import { getImageSrc } from '../../utils/imageUtils';
 
 function AdminGames() {
   const dispatch = useDispatch();
@@ -79,7 +80,7 @@ function AdminGames() {
                 <tr key={game._id}>
                   <td data-label="Image">
                     <img
-                      src={game.images?.[0] || 'https://placehold.co/60x40/0a0a1a/00d4ff?text=Game'}
+                      src={getImageSrc(game.images?.[0]) || 'https://placehold.co/60x40/0a0a1a/00d4ff?text=Game'}
                       alt={game.title}
                       className="admin-game-thumb"
                       onError={(e) => { e.target.src = 'https://placehold.co/60x40/0a0a1a/00d4ff?text=Game'; }}
