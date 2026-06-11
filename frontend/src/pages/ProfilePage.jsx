@@ -15,7 +15,7 @@ function ProfilePage() {
     (state) => state.orderLibrary || { loading: false, purchasedGames: [], error: null }
   );
 
-  const [activeTab, setActiveTab] = useState('orders');
+  const [activeTab, setActiveTab] = useState('library');
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
