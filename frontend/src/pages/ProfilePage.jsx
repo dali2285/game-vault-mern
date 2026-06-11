@@ -126,7 +126,7 @@ function ProfilePage() {
                   )}
                 </div>
                 <label htmlFor="avatarInput" className="avatar-upload-btn" title="Choose new avatar">
-                  <i class="fa-solid fa-camera"></i>
+                  <i className="fa-solid fa-camera"></i>
                 </label>
                 <input
                   id="avatarInput"
@@ -256,17 +256,61 @@ function LibraryTab() {
     purchasedGames: [],
     error: null,
   });
-  const [isInstallOpen, setIsInstallOpen] = useState(false);
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [downloadStatus, setDownloadStatus] = useState('idle');
+  const [downloadMessage, setDownloadMessage] = useState('');
 
-  const handleInstallClick = (game) => {
+  const handleDownloadClick = (game) => {
     setSelectedGame(game);
-    setIsInstallOpen(true);
+    setDownloadStatus('idle');
+    setDownloadMessage('');
+    setIsDownloadOpen(true);
   };
 
   const closeModal = () => {
-    setIsInstallOpen(false);
+    setIsDownloadOpen(false);
     setSelectedGame(null);
+    setDownloadStatus('idle');
+    setDownloadMessage('');
+  };
+
+  const handleDownloadGameImage = async () => {
+    if (!selectedGame) return;
+
+    const imageUrl = selectedGame.image || 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game';
+    const safeTitle = selectedGame.title ? selectedGame.title.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_') : 'game_image';
+    const extension = imageUrl.split('.').pop().split('?')[0] || 'jpg';
+    const filename = `${safeTitle}.${extension}`;
+
+    try {
+      setDownloadStatus('inProgress');
+      setDownloadMessage('Downloading image...');
+
+      const proxyUrl = `${API}/download?url=${encodeURIComponent(imageUrl)}`;
+      const response = await fetch(proxyUrl);
+      if (!response.ok) {
+        throw new Error('Unable to download image from proxy.');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      setDownloadStatus('completed');
+      setDownloadMessage('Download completed!');
+    } catch (err) {
+      console.error('Download error:', err);
+      setDownloadStatus('failed');
+      setDownloadMessage('Download failed. Please try again.');
+    }
   };
 
   if (loading) return <Loader />;
@@ -289,8 +333,8 @@ function LibraryTab() {
               />
               <div className="library-card-body">
                 <h3 className="library-card-title">{game.title || 'Untitled Game'}</h3>
-                <button type="button" className="btn btn-primary btn-install" onClick={() => handleInstallClick(game)}>
-                  Install
+                <button type="button" className="btn btn-primary btn-download" onClick={() => handleDownloadClick(game)}>
+                  Download
                 </button>
               </div>
             </div>
@@ -298,21 +342,50 @@ function LibraryTab() {
         </div>
       )}
 
-      {isInstallOpen && (
+      {isDownloadOpen && (
         <div className="modal-backdrop">
-          <div className="confirm-modal install-modal">
+          <div className="confirm-modal download-modal">
             <div className="confirm-modal-header">
-              <h2>Install Game</h2>
+              <h2>Download Game Image</h2>
             </div>
             <div className="confirm-modal-body">
               <p>
-                Feature coming soon{selectedGame?.title ? ` for ${selectedGame.title}` : ''}.
-                Your purchased game will be available here once install support is added.
+                {downloadStatus === 'idle' && (
+                  <>Ready to download the image for <strong>{selectedGame?.title || 'your game'}</strong>.</>
+                )}
+                {downloadStatus === 'inProgress' && (
+                  <>Downloading <strong>{selectedGame?.title || 'game image'}</strong>...</>
+                )}
+                {downloadStatus === 'completed' && (
+                  <>{downloadMessage || 'Download completed successfully.'}</>
+                )}
+                {downloadStatus === 'failed' && (
+                  <>{downloadMessage || 'Something went wrong while downloading.'}</>
+                )}
               </p>
+              {/* {downloadMessage && downloadStatus !== 'idle' && (
+                <p className="download-status-message">{downloadMessage}</p>
+              )} */}
             </div>
             <div className="confirm-modal-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleDownloadGameImage}
+                disabled={downloadStatus === 'inProgress'}
+              >
+                {downloadStatus === 'inProgress' ? (
+                  <>
+                    <span className="spinner-inline"></span> Downloading...
+                  </>
+                ) : downloadStatus === 'completed' ? (
+                  'Download Again'
+                ) : (
+                  'Download Image'
+                )}
+              </button>
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                Back
+                Close
               </button>
             </div>
           </div>
