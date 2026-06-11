@@ -518,7 +518,7 @@ h4 {
 .hamburger span {
   width: 25px;
   height: 2px;
-  background: var(--text);
+  background: var(--primary);
   transition: all 0.3s;
 }
 

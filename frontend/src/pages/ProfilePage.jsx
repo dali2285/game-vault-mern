@@ -10,10 +10,10 @@ import StarRating from '../components/StarRating';
 function ProfilePage() {
   const dispatch = useDispatch();
   const { userInfo, profile, loading } = useSelector((state) => state.auth);
+  console.log('Profile', profile);
   const { loading: libraryLoading, purchasedGames = [], error: libraryError } = useSelector(
     (state) => state.orderLibrary || { loading: false, purchasedGames: [], error: null }
   );
-  console.log('[v0] ProfilePage render:', { userInfo, profile, loading, libraryLoading, libraryError });
 
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedFile, setSelectedFile] = useState(null);
