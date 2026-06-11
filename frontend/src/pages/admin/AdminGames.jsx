@@ -77,7 +77,7 @@ function AdminGames() {
             <tbody>
               {games.map((game) => (
                 <tr key={game._id}>
-                  <td>
+                  <td data-label="Image">
                     <img
                       src={game.images?.[0] || 'https://placehold.co/60x40/0a0a1a/00d4ff?text=Game'}
                       alt={game.title}
@@ -85,11 +85,11 @@ function AdminGames() {
                       onError={(e) => { e.target.src = 'https://placehold.co/60x40/0a0a1a/00d4ff?text=Game'; }}
                     />
                   </td>
-                  <td>{game.title}</td>
-                  <td><span className="category-tag">{game.category}</span></td>
-                  <td>{game.price === 0 ? 'Free' : `$${game.price.toFixed(2)}`}</td>
-                  <td>{game.rating.toFixed(1)} &#9733;</td>
-                  <td className="action-btns">
+                  <td data-label="Title">{game.title}</td>
+                  <td data-label="Category"><span className="category-tag">{game.category}</span></td>
+                  <td data-label="Price">{game.price === 0 ? 'Free' : `$${game.price.toFixed(2)}`}</td>
+                  <td data-label="Rating">{game.rating.toFixed(1)} &#9733;</td>
+                  <td data-label="Actions">
                     <Link to={`/admin/games/edit/${game._id}`} className="btn-edit">Edit</Link>
                     <button className="btn-delete" onClick={() => handleDelete(game._id, game.title)}>
                       Delete

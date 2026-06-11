@@ -80,19 +80,19 @@ function AdminOrders() {
             <tbody>
               {orders.map((order) => (
                 <tr key={order._id}>
-                  <td className="order-id-cell">#{order._id.slice(-8).toUpperCase()}</td>
-                  <td>
+                  <td className="order-id-cell" data-label="Order ID">#{order._id.slice(-8).toUpperCase()}</td>
+                  <td data-label="User">
                     <div>{order.user?.name}</div>
                     <small>{order.user?.email}</small>
                   </td>
-                  <td>
+                  <td data-label="Games">
                     {order.games.map((g, i) => (
                       <span key={i} className="order-game-tag">{g.title} (x{g.quantity})</span>
                     ))}
                   </td>
-                  <td className="accent">${order.totalPrice.toFixed(2)}</td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                  <td>
+                  <td className="accent" data-label="Total">${order.totalPrice.toFixed(2)}</td>
+                  <td data-label="Date">{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td data-label="Status">
                     <select
                       className={`status-select status-${order.status}`}
                       value={order.status}

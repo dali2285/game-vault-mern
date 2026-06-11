@@ -76,7 +76,7 @@ function AdminDashboard() {
             <span className="ql-icon">&#127918;</span>
             <span>Manage Games</span>
           </Link>
-          <Link to="/admin/games/new" className="quick-link-card accent-card">
+          <Link to="/admin/games/new" className="quick-link-card">
             <span className="ql-icon">&#43;</span>
             <span>Add New Game</span>
           </Link>

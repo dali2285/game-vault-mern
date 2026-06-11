@@ -95,15 +95,15 @@ function AdminUsers() {
             <tbody>
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
+                  <td data-label="Name">{user.name}</td>
+                  <td data-label="Email">{user.email}</td>
+                  <td data-label="Role">
                     <span className={`role-badge ${user.role === 'admin' ? 'admin' : ''}`}>
                       {user.role}
                     </span>
                   </td>
-                  <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                  <td>
+                  <td data-label="Joined">{new Date(user.createdAt).toLocaleDateString()}</td>
+                  <td data-label="Actions">
                     {user.role !== 'admin' && (
                       <button
                         className="btn-delete"
