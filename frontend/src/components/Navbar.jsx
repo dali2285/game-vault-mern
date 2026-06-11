@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/authActions';
@@ -14,6 +14,22 @@ function Navbar() {
   const { cartItems } = useSelector((state) => state.cart);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const handleDocumentClick = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setMenuOpen(false);
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const avatarUrl = profile?.avatarUrl || userInfo?.avatarUrl;
@@ -33,9 +49,9 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" ref={navRef}>
       <div className="navbar-inner">
-        <Link to="/">
+        <Link to="/" onClick={() => { setMenuOpen(false); setDropdownOpen(false) }}>
           <img src="/GameVault_Logo_v5.png" alt="GameVault logo" className="navbar-logo-image" />
         </Link>
 
@@ -55,7 +71,7 @@ function Navbar() {
 
           <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Home</Link>
           <Link to="/games" className="nav-link" onClick={() => setMenuOpen(false)}>Games</Link>
-          
+
           {userInfo ? (
             <>
               <Link to="/cart" className="nav-link cart-link" onClick={() => setMenuOpen(false)}>
