@@ -19,6 +19,7 @@ function GameDetailPage() {
   const { game, loading, error } = useSelector((state) => state.gameDetail);
   const { userInfo, profile } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
+  const { purchasedGames = [] } = useSelector((state) => state.orderLibrary || { purchasedGames: [] });
   const { loading: reviewLoading, success: reviewSuccess, error: reviewError } = useSelector((state) => state.review);
 
   const [rating, setRating] = useState(0);
@@ -29,6 +30,11 @@ function GameDetailPage() {
   const isWishlisted = profile?.wishlist?.some((wId) =>
     (typeof wId === 'object' ? wId._id : wId) === id
   );
+
+  const isInLibrary = purchasedGames.some((item) => {
+    const libraryGameId = item.gameId?._id || item.gameId || item._id;
+    return libraryGameId === id;
+  });
 
   const isInCart = cartItems.some(
     (item) => (item.game?._id ?? item.game) === id
@@ -51,6 +57,10 @@ function GameDetailPage() {
 
   const handleAddToCart = () => {
     if (!userInfo) { navigate('/login'); return; }
+    if (isInLibrary) {
+      showToast('Game already in library', 'error');
+      return;
+    }
     if (isInCart) {
       showToast('Game already in cart', 'error');
       return;
@@ -124,12 +134,12 @@ function GameDetailPage() {
           </div>
           <div className="game-actions">
             <button
-              className={`btn-primary ${isInCart ? 'disabled' : ''}`}
+              className={`btn-primary ${(isInLibrary || isInCart) ? 'disabled' : ''}`}
               onClick={handleAddToCart}
-              disabled={isInCart}
-              aria-label={isInCart ? 'Already in cart' : 'Add to cart'}
+              disabled={isInLibrary || isInCart}
+              aria-label={isInLibrary ? 'Already in library' : isInCart ? 'Already in cart' : 'Add to cart'}
             >
-              {isInCart ? 'In Cart' : 'Add to Cart'}
+              {isInLibrary ? 'In Library' : isInCart ? 'In Cart' : 'Add to Cart'}
             </button>
             <button
               className={`btn-wishlist ${isWishlisted ? 'active' : ''}`}

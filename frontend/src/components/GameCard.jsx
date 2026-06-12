@@ -12,9 +12,14 @@ function GameCard({ game }) {
   const { showToast } = useToast();
   const { userInfo, profile } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
+  const { purchasedGames = [] } = useSelector((state) => state.orderLibrary || { purchasedGames: [] });
   const isWishlisted = profile?.wishlist?.some((id) =>
     (typeof id === 'object' ? id._id : id) === game._id
   );
+  const isInLibrary = purchasedGames.some((item) => {
+    const libraryGameId = item.gameId?._id || item.gameId || item._id;
+    return libraryGameId === game._id;
+  });
   const isInCart = cartItems.some(
     (item) => (item.game?._id ?? item.game) === game._id
   );
@@ -22,6 +27,10 @@ function GameCard({ game }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     if (!userInfo) return;
+    if (isInLibrary) {
+      showToast('Game already in library', 'error');
+      return;
+    }
     if (isInCart) {
       showToast('Game already in cart', 'error');
       return;
@@ -69,12 +78,12 @@ function GameCard({ game }) {
             </span>
             {userInfo && (
               <button
-                className={`btn-add-cart ${isInCart ? 'disabled' : ''}`}
+                className={`btn-add-cart ${isInLibrary || isInCart ? 'disabled' : ''}`}
                 onClick={handleAddToCart}
-                disabled={isInCart}
-                aria-label={isInCart ? 'Already in cart' : 'Add to cart'}
+                disabled={isInLibrary || isInCart}
+                aria-label={isInLibrary ? 'Already in library' : isInCart ? 'Already in cart' : 'Add to cart'}
               >
-                {isInCart ? 'In Cart' : (
+                {isInLibrary ? 'In Library' : isInCart ? 'In Cart' : (
                   <>
                     <i className="fa-solid fa-cart-plus"></i> Cart
                   </>

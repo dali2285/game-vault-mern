@@ -6,6 +6,7 @@ import {
 
 const initialState = {
   loading: false,
+  loaded: false,
   purchasedGames: [],
   error: null,
 };
@@ -13,11 +14,11 @@ const initialState = {
 const orderLibraryReducer = (state = initialState, action) => {
   switch (action.type) {
     case ORDER_LIBRARY_REQUEST:
-      return { ...state, loading: true, error: null };
+      return { ...state, loading: true, loaded: false, error: null };
     case ORDER_LIBRARY_SUCCESS:
-      return { ...state, loading: false, purchasedGames: action.payload, error: null };
+      return { ...state, loading: false, loaded: true, purchasedGames: action.payload, error: null };
     case ORDER_LIBRARY_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, loading: false, loaded: true, error: action.payload };
     default:
       return state;
   }

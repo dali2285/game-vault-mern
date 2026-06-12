@@ -333,10 +333,17 @@ function LibraryTab() {
                 onError={(e) => { e.target.src = 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game'; }}
               />
               <div className="library-card-body">
-                <h3 className="library-card-title">{game.title || 'Untitled Game'}</h3>
-                <button type="button" className="btn btn-primary btn-download" onClick={() => handleDownloadClick(game)}>
-                  Download
-                </button>
+                <div>
+                  <h3 className="library-card-title">{game.title || 'Untitled Game'}</h3>
+                </div>
+                <div className="library-card-actions">
+                  <Link to={`/games/${game.gameId}`} className="btn btn-secondary btn-full library-card-details">
+                    View Details
+                  </Link>
+                  <button type="button" className="btn btn-primary btn-download" onClick={() => handleDownloadClick(game)}>
+                    Download
+                  </button>
+                </div>
               </div>
             </div>
           ))}

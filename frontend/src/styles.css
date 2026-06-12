@@ -236,6 +236,12 @@ h4 {
   transform: translateY(-2px);
 }
 
+.library-card-details:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(255, 26, 122, 0.35);
+  color: var(--text);
+}
+
 .btn-outline {
   background: transparent;
   border: 2px solid var(--primary);
@@ -341,6 +347,18 @@ h4 {
   padding: 1rem 1.5rem 1.5rem;
 }
 
+/* ==================== ANIMATIONS ==================== */
+@keyframes slideUnderline {
+  from {
+    width: 0;
+    left: 0;
+  }
+  to {
+    width: 100%;
+    left: 0;
+  }
+}
+
 /* ==================== NAVBAR ==================== */
 .navbar {
   background: rgba(10, 10, 26, 0.95);
@@ -379,8 +397,32 @@ h4 {
   transition: color 0.2s;
 }
 
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: none;
+}
+
 .nav-link:hover {
   color: var(--primary);
+}
+
+/* .nav-link:hover::after {
+  animation: slideUnderline 0.3s ease-out forwards;
+} */
+
+.nav-link.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  animation: slideUnderline 0.3s ease-out forwards;
 }
 
 .nav-btn {
@@ -660,7 +702,7 @@ h4 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: 360px;
+  min-height: 360px;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   box-shadow: var(--shadow);
 }
@@ -684,6 +726,11 @@ h4 {
   justify-content: space-between;
   padding: 1.25rem;
   gap: 1rem;
+}
+
+.library-card-actions {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .library-card-title {

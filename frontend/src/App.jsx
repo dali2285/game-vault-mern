@@ -8,6 +8,7 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import { loadCart } from '../redux/actions/cartActions';
 import { getProfile } from '../redux/actions/authActions';
+import { listPurchasedGames } from '../redux/actions/orderActions';
 
 import HomePage from './pages/HomePage';
 import GamesPage from './pages/GamesPage';
@@ -26,6 +27,7 @@ import GameFormPage from './pages/admin/GameFormPage';
 function App() {
   const dispatch = useDispatch();
   const { userInfo, profile } = useSelector((state) => state.auth);
+  const { loaded: libraryLoaded } = useSelector((state) => state.orderLibrary || { loaded: false });
 
   useEffect(() => {
     if (userInfo) {
@@ -33,8 +35,11 @@ function App() {
       if (!profile) {
         dispatch(getProfile());
       }
+      if (!libraryLoaded) {
+        dispatch(listPurchasedGames());
+      }
     }
-  }, [dispatch, userInfo, profile]);
+  }, [dispatch, userInfo, profile, libraryLoaded]);
 
   return (
     <ThemeProvider>

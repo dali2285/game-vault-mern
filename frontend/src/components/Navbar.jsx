@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/authActions';
 import { useToast } from './Toast';
@@ -8,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
   const { theme, toggleTheme } = useTheme();
   const { userInfo, profile } = useSelector((state) => state.auth);
@@ -48,6 +49,8 @@ function Navbar() {
     navigate('/');
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
     <nav className="navbar" ref={navRef}>
       <div className="navbar-inner">
@@ -69,12 +72,12 @@ function Navbar() {
             )}
           </button>
 
-          <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/games" className="nav-link" onClick={() => setMenuOpen(false)}>Games</Link>
+          <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Home</Link>
+          <Link to="/games" className={`nav-link ${isActive('/games') ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Games</Link>
 
           {userInfo ? (
             <>
-              <Link to="/cart" className="nav-link cart-link" onClick={() => setMenuOpen(false)}>
+              <Link to="/cart" className={`nav-link cart-link ${isActive('/cart') ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>
                 Cart
                 {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
               </Link>
