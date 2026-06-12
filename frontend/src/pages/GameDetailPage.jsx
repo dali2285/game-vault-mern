@@ -8,6 +8,7 @@ import { toggleWishlist } from '../../redux/actions/authActions';
 import StarRating from '../components/StarRating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import { useToast } from '../components/Toast';
 import { normalizeImages } from '../utils/imageUtils';
 
 function GameDetailPage() {
@@ -17,6 +18,7 @@ function GameDetailPage() {
 
   const { game, loading, error } = useSelector((state) => state.gameDetail);
   const { userInfo, profile } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
   const { loading: reviewLoading, success: reviewSuccess, error: reviewError } = useSelector((state) => state.review);
 
   const [rating, setRating] = useState(0);
@@ -26,6 +28,10 @@ function GameDetailPage() {
 
   const isWishlisted = profile?.wishlist?.some((wId) =>
     (typeof wId === 'object' ? wId._id : wId) === id
+  );
+
+  const isInCart = cartItems.some(
+    (item) => (item.game?._id ?? item.game) === id
   );
 
   useEffect(() => {
@@ -41,9 +47,16 @@ function GameDetailPage() {
     }
   }, [reviewSuccess]);
 
+  const { showToast } = useToast();
+
   const handleAddToCart = () => {
     if (!userInfo) { navigate('/login'); return; }
+    if (isInCart) {
+      showToast('Game already in cart', 'error');
+      return;
+    }
     dispatch(addToCart(id));
+    showToast('Added to cart', 'success');
   };
 
   const handleWishlist = () => {
@@ -110,8 +123,13 @@ function GameDetailPage() {
             </span>
           </div>
           <div className="game-actions">
-            <button className="btn-primary" onClick={handleAddToCart}>
-              Add to Cart
+            <button
+              className={`btn-primary ${isInCart ? 'disabled' : ''}`}
+              onClick={handleAddToCart}
+              disabled={isInCart}
+              aria-label={isInCart ? 'Already in cart' : 'Add to cart'}
+            >
+              {isInCart ? 'In Cart' : 'Add to Cart'}
             </button>
             <button
               className={`btn-wishlist ${isWishlisted ? 'active' : ''}`}

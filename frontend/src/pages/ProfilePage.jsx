@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProfile, uploadAvatar } from '../../redux/actions/authActions';
+import { getProfile, toggleWishlist, uploadAvatar } from '../../redux/actions/authActions';
 import { listMyOrders, listPurchasedGames } from '../../redux/actions/orderActions';
 import { useToast } from '../components/Toast';
 import Loader from '../components/Loader';
@@ -397,6 +397,16 @@ function LibraryTab() {
 }
 
 function WishlistTab({ profile }) {
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const handleWishlist = (event, game) => {
+    event.preventDefault();
+    if (!userInfo) return;
+    const gameId = typeof game === 'object' ? game._id : game;
+    dispatch(toggleWishlist(gameId));
+  };
+
   return (
     <div className="tab-content">
       <h2 className="tab-title">Wishlist</h2>
@@ -404,21 +414,45 @@ function WishlistTab({ profile }) {
         <p className="empty-state">Your wishlist is empty. <Link to="/games" className="accent">Browse games!</Link></p>
       ) : (
         <div className="games-grid">
-          {profile.wishlist.map((game) => (
-            <Link key={game._id || game} to={`/games/${game._id || game}`} className="wishlist-game-card">
-              <img
-                src={getImageSrc(game.images?.[0]) || 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'}
-                alt={game.title || 'Game'}
-                onError={(e) => { e.target.src = 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'; }}
-              />
-              <div>
-                <p className="wishlist-game-title">{game.title}</p>
-                {game.price !== undefined && (
-                  <p className="accent">{game.price === 0 ? 'Free' : `$${game.price.toFixed(2)}`}</p>
-                )}
+          {profile.wishlist.map((game) => {
+            const gameId = typeof game === 'object' ? game._id : game;
+            const gameTitle = typeof game === 'object' ? game.title : 'Untitled Game';
+            const gameImage = typeof game === 'object' ? getImageSrc(game.images?.[0]) : null;
+            const gamePrice = typeof game === 'object' ? game.price : undefined;
+
+            return (
+              <div key={gameId} className="wishlist-game-card">
+                <div className="wishlist-game-card-media">
+                  <Link to={`/games/${gameId}`} className="wishlist-game-link">
+                    <img
+                      src={gameImage || 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'}
+                      alt={gameTitle}
+                      onError={(e) => { e.target.src = 'https://placehold.co/120x80/0a0a1a/00d4ff?text=Game'; }}
+                    />
+                  </Link>
+                  {userInfo && (
+                    <button
+                      type="button"
+                      className="wishlist-btn active"
+                      onClick={(e) => handleWishlist(e, game)}
+                      aria-label="Remove from wishlist"
+                      title="Remove from wishlist"
+                    >
+                      ♥
+                    </button>
+                  )}
+                </div>
+                <div className="wishlist-game-card-info">
+                  <Link to={`/games/${gameId}`} className="wishlist-game-title-link">
+                    <p className="wishlist-game-title">{gameTitle}</p>
+                  </Link>
+                  {gamePrice !== undefined && (
+                    <p className="accent">{gamePrice === 0 ? 'Free' : `$${gamePrice.toFixed(2)}`}</p>
+                  )}
+                </div>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
+import { loadCart } from '../redux/actions/cartActions';
+import { getProfile } from '../redux/actions/authActions';
 
 import HomePage from './pages/HomePage';
 import GamesPage from './pages/GamesPage';
@@ -21,6 +24,18 @@ import AdminOrders from './pages/admin/AdminOrders';
 import GameFormPage from './pages/admin/GameFormPage';
 
 function App() {
+  const dispatch = useDispatch();
+  const { userInfo, profile } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(loadCart());
+      if (!profile) {
+        dispatch(getProfile());
+      }
+    }
+  }, [dispatch, userInfo, profile]);
+
   return (
     <ThemeProvider>
       <Router>

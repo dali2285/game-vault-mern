@@ -4,19 +4,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/actions/cartActions';
 import { toggleWishlist } from '../../redux/actions/authActions';
 import StarRating from './StarRating';
+import { useToast } from './Toast';
 import { getImageSrc } from '../utils/imageUtils';
 
 function GameCard({ game }) {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { userInfo, profile } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
   const isWishlisted = profile?.wishlist?.some((id) =>
     (typeof id === 'object' ? id._id : id) === game._id
+  );
+  const isInCart = cartItems.some(
+    (item) => (item.game?._id ?? item.game) === game._id
   );
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     if (!userInfo) return;
+    if (isInCart) {
+      showToast('Game already in cart', 'error');
+      return;
+    }
     dispatch(addToCart(game._id));
+    showToast('Added to cart', 'success');
   };
 
   const handleWishlist = (e) => {
@@ -57,8 +68,17 @@ function GameCard({ game }) {
               {game.price === 0 ? 'Free' : `$${game.price.toFixed(2)}`}
             </span>
             {userInfo && (
-              <button className="btn-add-cart" onClick={handleAddToCart}>
-                + Cart
+              <button
+                className={`btn-add-cart ${isInCart ? 'disabled' : ''}`}
+                onClick={handleAddToCart}
+                disabled={isInCart}
+                aria-label={isInCart ? 'Already in cart' : 'Add to cart'}
+              >
+                {isInCart ? 'In Cart' : (
+                  <>
+                    <i className="fa-solid fa-cart-plus"></i> Cart
+                  </>
+                )}
               </button>
             )}
           </div>

@@ -38,6 +38,7 @@ const toggleWishlist = async (req, res) => {
       user.wishlist.push(gameId);
     }
     await user.save();
+    await user.populate('wishlist', 'title price images rating');
     res.json(user.wishlist);
   } catch (err) {
     console.error('[v0] toggleWishlist error:', err.message);
