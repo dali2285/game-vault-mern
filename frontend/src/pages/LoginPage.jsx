@@ -38,7 +38,7 @@ function LoginPage() {
           <img src="/GameVault_Logo_v5.png" alt="GameVault logo" className="auth-logo-image" />
         </div>
         <h2 className="auth-title">Welcome Back</h2>
-        <p className="auth-subtitle">Sign in to your account</p>
+        <p className="auth-subtitle">Login to your account</p>
 
         {error && <Message type="error">{error}</Message>}
 
@@ -70,7 +70,7 @@ function LoginPage() {
             />
           </div>
           <button type="submit" className="btn-primary btn-full" disabled={loading}>
-            {loading ? <Loader size="sm" /> : 'Sign In'}
+            {loading ? <Loader size="sm" /> : 'Login'}
           </button>
         </form>
 

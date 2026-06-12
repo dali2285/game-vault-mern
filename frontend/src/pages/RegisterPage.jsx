@@ -109,7 +109,7 @@ function RegisterPage() {
 
         <p className="auth-switch">
           Already have an account?{' '}
-          <Link to="/login" className="accent">Sign in</Link>
+          <Link to="/login" className="accent">Login</Link>
         </p>
       </div>
     </div>

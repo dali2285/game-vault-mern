@@ -280,7 +280,7 @@ function LibraryTab() {
   const handleDownloadGameImage = async () => {
     if (!selectedGame) return;
 
-    const imageUrl = selectedGame.image || 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game';
+    const imageUrl = getImageSrc(selectedGame.image) || 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game';
     const safeTitle = selectedGame.title ? selectedGame.title.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_') : 'game_image';
     const extension = imageUrl.split('.').pop().split('?')[0] || 'jpg';
     const filename = `${safeTitle}.${extension}`;
@@ -328,7 +328,7 @@ function LibraryTab() {
             <div key={game.gameId} className="library-card">
               <img
                 className="library-card-image"
-                src={game.image || 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game'}
+                src={getImageSrc(game.image) || 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game'}
                 alt={game.title || 'Purchased game'}
                 onError={(e) => { e.target.src = 'https://placehold.co/200x120/0a0a1a/00d4ff?text=Game'; }}
               />
