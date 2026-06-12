@@ -41,6 +41,10 @@ function GamesPage() {
     setPage(1);
   };
 
+  const handlePageChange = (pageNumber) => {
+    setPage(pageNumber);
+  };
+
   return (
     <div className="page games-page">
       <div className="games-page-header">
@@ -111,8 +115,9 @@ function GamesPage() {
                   {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
                     <button
                       key={p}
+                      type="button"
                       className={`page-btn ${page === p ? 'active' : ''}`}
-                      onClick={() => setPage(p)}
+                      onClick={() => handlePageChange(p)}
                     >
                       {p}
                     </button>

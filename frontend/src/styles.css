@@ -1388,8 +1388,8 @@ h4 {
 
 .game-main-image {
   width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
+  /* aspect-ratio: 16/9; */
+  /* object-fit: cover; */
   border-radius: var(--radius);
   border: 1px solid var(--border);
   overflow: hidden;
@@ -1404,6 +1404,7 @@ h4 {
 
 .game-thumbnails {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 

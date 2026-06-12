@@ -15,11 +15,11 @@ const getGames = async (req, res) => {
     }
 
     let sortOption = {};
-    if (sort === 'price_asc') sortOption = { price: 1 };
-    else if (sort === 'price_desc') sortOption = { price: -1 };
-    else if (sort === 'rating') sortOption = { rating: -1 };
-    else if (sort === 'newest') sortOption = { createdAt: -1 };
-    else sortOption = { createdAt: -1 };
+    if (sort === 'price_asc') sortOption = { price: 1, _id: 1 };
+    else if (sort === 'price_desc') sortOption = { price: -1, _id: -1 };
+    else if (sort === 'rating') sortOption = { rating: -1, _id: -1 };
+    else if (sort === 'newest') sortOption = { createdAt: -1, _id: -1 };
+    else sortOption = { createdAt: -1, _id: -1 };
 
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Game.countDocuments(query);
